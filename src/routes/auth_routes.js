@@ -1,12 +1,19 @@
 import { Router } from "express";
 
+import {
+  register,
+  login,
+  getCurrentUser,
+} from "../controllers/auth_controller.js";
+
+import { protect } from "../middlewares/auth_middleware.js";
+
 const router = Router();
 
-router.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Auth routes are ready",
-  });
-});
+router.post("/register", register);
+
+router.post("/login", login);
+
+router.get("/", protect, getCurrentUser);
 
 export default router;
