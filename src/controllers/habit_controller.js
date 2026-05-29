@@ -7,6 +7,7 @@ import {
   getHabitById,
   updateHabit,
   deleteHabit,
+  completeHabit,
 } from "../services/habit_service.js";
 
 export const createHabitController = asyncHandler(async (req, res) => {
@@ -95,5 +96,21 @@ export const deleteHabitController = asyncHandler(async (req, res) => {
     data: {
       habit,
     },
+  });
+});
+
+export const completeHabitController = asyncHandler(async (req, res) => {
+  const result = await completeHabit({
+    userId: req.user._id,
+    habitId: req.params.id,
+    mood: req.body.mood,
+    notes: req.body.notes,
+  });
+
+  return sendSuccess({
+    res,
+    statusCode: HTTP_STATUS.CREATED,
+    message: "Habit completed successfully",
+    data: result,
   });
 });

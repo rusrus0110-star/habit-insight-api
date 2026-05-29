@@ -9,6 +9,7 @@ import {
   getHabitByIdController,
   updateHabitController,
   deleteHabitController,
+  completeHabitController,
 } from "../controllers/habit_controller.js";
 
 const router = Router();
@@ -16,6 +17,8 @@ const router = Router();
 router.use(protect);
 
 router.route("/").post(createHabitController).get(getHabitsController);
+
+router.post("/:id/complete", validateObjectId("id"), completeHabitController);
 
 router
   .route("/:id")

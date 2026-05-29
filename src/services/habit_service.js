@@ -5,7 +5,14 @@ import { HTTP_STATUS } from "../constants/http_status_constants.js";
 import {
   HABIT_CATEGORIES,
   HABIT_DIFFICULTIES,
+  MOOD_MIN_VALUE,
+  MOOD_MAX_VALUE,
 } from "../constants/habit_constants.js";
+import { startOfDay } from "../utils/date.js";
+import {
+  getLastCompletionBeforeToday,
+  shouldIncreaseStreak,
+} from "./streak_service.js";
 
 const validateHabitPayload = ({ name, category, difficulty }) => {
   if (!name || !category || !difficulty) {
@@ -33,6 +40,34 @@ const validateHabitPayload = ({ name, category, difficulty }) => {
     throw new ApiError(
       HTTP_STATUS.BAD_REQUEST,
       `Difficulty must be one of: ${HABIT_DIFFICULTIES.join(", ")}`,
+    );
+  }
+};
+
+const validateCompletePayload = ({ mood, notes }) => {
+  if (mood === undefined || mood === null) {
+    throw new ApiError(HTTP_STATUS.BAD_REQUEST, "Mood is required");
+  }
+
+  if (typeof mood !== "number") {
+    throw new ApiError(HTTP_STATUS.BAD_REQUEST, "Mood must be a number");
+  }
+
+  if (mood < MOOD_MIN_VALUE || mood > MOOD_MAX_VALUE) {
+    throw new ApiError(
+      HTTP_STATUS.BAD_REQUEST,
+      `Mood must be between ${MOOD_MIN_VALUE} and ${MOOD_MAX_VALUE}`,
+    );
+  }
+
+  if (notes !== undefined && typeof notes !== "string") {
+    throw new ApiError(HTTP_STATUS.BAD_REQUEST, "Notes must be a string");
+  }
+
+  if (notes && notes.length > 500) {
+    throw new ApiError(
+      HTTP_STATUS.BAD_REQUEST,
+      "Notes must not exceed 500 characters",
     );
   }
 };
@@ -180,4 +215,68 @@ export const deleteHabit = async ({ userId, habitId }) => {
   });
 
   return habit;
+};
+
+export const completeHabit = async ({ userId, habitId, mood, notes = "" }) => {
+  validateCompletePayload({
+    mood,
+    notes,
+  });
+
+  const habit = await Habit.findOne({
+    _id: habitId,
+    userId,
+  });
+
+  if (!habit) {
+    throw new ApiError(HTTP_STATUS.NOT_FOUND, "Habit not found");
+  }
+
+  const today = startOfDay(new Date());
+
+  const existingProgress = await Progress.findOne({
+    userId,
+    habitId,
+    date: today,
+  });
+
+  if (existingProgress) {
+    throw new ApiError(
+      HTTP_STATUS.CONFLICT,
+      "Habit has already been completed today",
+    );
+  }
+
+  const lastCompletion = await getLastCompletionBeforeToday({
+    userId,
+    habitId,
+  });
+
+  const shouldContinueCurrentStreak = shouldIncreaseStreak(
+    lastCompletion?.date,
+  );
+
+  const nextStreak = shouldContinueCurrentStreak ? habit.streak + 1 : 1;
+
+  const nextBestStreak = Math.max(habit.bestStreak, nextStreak);
+
+  const progress = await Progress.create({
+    userId,
+    habitId,
+    date: today,
+    completed: true,
+    mood,
+    notes: notes.trim(),
+  });
+
+  habit.streak = nextStreak;
+  habit.bestStreak = nextBestStreak;
+  habit.totalCompletions += 1;
+
+  await habit.save();
+
+  return {
+    habit,
+    progress,
+  };
 };
