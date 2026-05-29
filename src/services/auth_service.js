@@ -1,7 +1,7 @@
 import User from "../models/User.js";
-import { ApiError } from "../utils/api-error.js";
+import { ApiError } from "../utils/api_error.js";
 import { generateToken } from "../utils/jwt.js";
-import { HTTP_STATUS } from "../constants/http-status_constants.js";
+import { HTTP_STATUS } from "../constants/http_status_constants.js";
 
 const sanitizeUser = (user) => {
   return {

@@ -1,5 +1,5 @@
-import { ApiError } from "../utils/api-error.js";
-import { HTTP_STATUS } from "../constants/http-status_constants.js";
+import { ApiError } from "../utils/api_error.js";
+import { HTTP_STATUS } from "../constants/http_status_constants.js";
 
 export const notFoundMiddleware = (req, res, next) => {
   next(

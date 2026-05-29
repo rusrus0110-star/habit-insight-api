@@ -5,7 +5,7 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 
 import router from "./routes/index.js";
-import { notFoundMiddleware } from "./middlewares/not-found_middleware.js";
+import { notFoundMiddleware } from "./middlewares/not_found_middleware.js";
 import { errorMiddleware } from "./middlewares/error_middleware.js";
 
 const app = express();

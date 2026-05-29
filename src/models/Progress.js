@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import {
   MOOD_MIN_VALUE,
   MOOD_MAX_VALUE,
-} from "../constants/habit.constants.js";
+} from "../constants/habit_constants.js";
 
 const progressSchema = new mongoose.Schema(
   {

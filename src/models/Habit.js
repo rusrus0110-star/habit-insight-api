@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import {
   HABIT_CATEGORIES,
   HABIT_DIFFICULTIES,
-} from "../constants/habit.constants.js";
+} from "../constants/habit_constants.js";
 
 const habitSchema = new mongoose.Schema(
   {

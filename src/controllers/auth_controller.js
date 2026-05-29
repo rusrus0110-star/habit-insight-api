@@ -1,7 +1,7 @@
-import { asyncHandler } from "../utils/async-handler.js";
-import { sendSuccess } from "../utils/api-response.js";
-import { ApiError } from "../utils/api-error.js";
-import { HTTP_STATUS } from "../constants/http-status_constants.js";
+import { asyncHandler } from "../utils/async_handler.js";
+import { sendSuccess } from "../utils/api_response.js";
+import { ApiError } from "../utils/api_error.js";
+import { HTTP_STATUS } from "../constants/http_status_constants.js";
 import {
   registerUser,
   loginUser,

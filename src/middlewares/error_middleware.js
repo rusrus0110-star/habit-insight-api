@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from "../constants/http-status_constants.js";
+import { HTTP_STATUS } from "../constants/http_status_constants.js";
 
 export const errorMiddleware = (error, req, res, next) => {
   const statusCode = error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR;
